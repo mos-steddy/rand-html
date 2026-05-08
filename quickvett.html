@@ -14,8 +14,8 @@
     --ink: #0A0A0A;
     --ink-soft: #2A2A28;
     --rule: #0A0A0A;
-    --alert: #FF3B14;
-    --alert-2: #E12E0A;
+    --alert: #A23F1E;
+    --alert-2: #7E2F15;
     --grid: rgba(10,10,10,0.08);
     --pad: clamp(16px, 2.4vw, 36px);
   }
@@ -856,10 +856,10 @@
   </div>
   <div class="demo-right">
     <span class="section-tag"><span class="num">03</span>Live Result</span>
-    <div class="search-box">
-      <input type="text" value="Apex Logistics LLC, NJ" />
-      <button class="submit">Vet Now <span>→</span></button>
-    </div>
+    <form class="search-box" action="report.html" method="get">
+      <input type="text" name="q" value="Apex Logistics LLC, NJ" />
+      <button class="submit" type="submit">Vet Now <span>→</span></button>
+    </form>
     <div class="result">
       <div class="result-head">
         <span>// REPORT QV-887421 — Generated 7.1s ago</span>
