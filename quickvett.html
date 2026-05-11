@@ -1,1118 +1,1048 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>QUICKVETT — Pre-funding intelligence for MCA underwriters</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quickvett — Pre-funding intelligence for MCA underwriters</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bone: #E8E3D6;
-    --bone-2: #DDD7C7;
-    --ink: #0A0A0A;
-    --ink-soft: #2A2A28;
-    --rule: #0A0A0A;
-    --alert: #A23F1E;
-    --alert-2: #7E2F15;
-    --grid: rgba(10,10,10,0.08);
-    --pad: clamp(16px, 2.4vw, 36px);
-  }
+:root {
+  --bone: #E8E3D6;
+  --bone-2: #DDD7C7;
+  --bone-3: #D2CCB9;
+  --ink: #0A0A0A;
+  --ink-soft: #2A2A28;
+  --ink-faint: #6E6A60;
+  --alert: #A23F1E;
+  --alert-2: #7E2F15;
+  --pad: clamp(20px, 3vw, 40px);
+}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { background: var(--bone); color: var(--ink); }
-  body {
-    font-family: "JetBrains Mono", ui-monospace, monospace;
-    font-size: 13px;
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
-    background-image:
-      linear-gradient(var(--grid) 1px, transparent 1px),
-      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-    background-size: 80px 80px;
-    background-position: -1px -1px;
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-  ::selection { background: var(--alert); color: var(--bone); }
+html, body { background: var(--bone); color: var(--ink); }
 
-  a { color: inherit; text-decoration: none; }
-  button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+body {
+  font-family: "Instrument Serif", "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
 
-  .mono { font-family: "JetBrains Mono", monospace; }
-  .serif { font-family: "Instrument Serif", serif; font-weight: 400; }
-  .upper { text-transform: uppercase; letter-spacing: 0.04em; }
-  .tiny { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; }
+::selection { background: var(--alert); color: var(--bone); }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
 
-  /* ---------- TOP STATUS BAR ---------- */
-  .topbar {
-    position: sticky; top: 0; z-index: 100;
-    border-bottom: 1px solid var(--ink);
-    background: var(--bone);
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    height: 32px;
-    padding: 0 var(--pad);
-    font-size: 10px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-  }
-  .topbar .left, .topbar .right { display: flex; gap: 24px; align-items: center; }
-  .topbar .right { justify-content: flex-end; }
-  .topbar .center { display: flex; gap: 10px; align-items: center; }
-  .blink { display: inline-block; width: 8px; height: 8px; background: var(--alert); animation: blink 1.1s steps(2) infinite; }
-  @keyframes blink { 50% { opacity: 0; } }
+.mono {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.serif-it { font-style: italic; }
 
-  /* ---------- NAV ---------- */
-  .nav {
-    border-bottom: 2px solid var(--ink);
-    background: var(--bone);
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: stretch;
-    height: 76px;
-    padding: 0 var(--pad);
-  }
-  .nav .brand {
-    display: flex; align-items: center; gap: 14px;
-    border-right: 1px solid var(--ink);
-    padding-right: 24px; margin-right: 24px;
-  }
-  .brand-mark {
-    width: 30px; height: 30px;
-    background: var(--ink);
-    color: var(--alert);
-    display: grid; place-items: center;
-    font-weight: 700; font-size: 18px;
-    position: relative;
-  }
-  .brand-mark::after {
-    content: ""; position: absolute; inset: 3px;
-    border: 1px solid var(--alert);
-  }
-  .brand-name {
-    font-weight: 700; font-size: 18px; letter-spacing: 0.02em;
-  }
-  .brand-sub {
-    font-size: 9px; letter-spacing: 0.16em;
-    text-transform: uppercase; color: var(--ink-soft);
-    margin-top: 2px;
-  }
-  .nav-links {
-    display: flex; align-items: center; gap: 0;
-  }
-  .nav-links a {
-    padding: 0 22px; height: 100%;
-    display: flex; align-items: center;
-    font-size: 11px; letter-spacing: 0.12em;
-    text-transform: uppercase;
-    border-right: 1px solid var(--ink);
-    transition: background 0.08s;
-  }
-  .nav-links a:first-child { border-left: 1px solid var(--ink); }
-  .nav-links a:hover { background: var(--ink); color: var(--bone); }
-  .nav-links a .num { color: var(--alert); margin-right: 8px; font-weight: 500; }
-  .nav-cta {
-    display: flex; align-items: center; gap: 10px;
-  }
-  .nav-cta .login {
-    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
-    padding: 0 16px;
-  }
-  .btn {
-    background: var(--ink); color: var(--bone);
-    height: 44px; padding: 0 22px;
-    font-size: 11px; letter-spacing: 0.14em;
-    text-transform: uppercase; font-weight: 500;
-    display: inline-flex; align-items: center; gap: 10px;
-    border: 1px solid var(--ink);
-    transition: all 0.08s;
-  }
-  .btn:hover { background: var(--alert); border-color: var(--alert); color: var(--bone); }
-  .btn .arrow { font-family: monospace; }
+/* ===== NAV ===== */
+.nav {
+  border-bottom: 2px solid var(--ink);
+  background: var(--bone);
+  padding: 18px var(--pad);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.brand-mark {
+  width: 28px;
+  height: 28px;
+  background: var(--ink);
+  color: var(--alert);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 16px;
+  font-family: "Instrument Serif", serif;
+  font-style: italic;
+  position: relative;
+  flex-shrink: 0;
+}
+.brand-mark::after {
+  content: "";
+  position: absolute;
+  top: 3px; left: 3px; right: 3px; bottom: 3px;
+  border: 1px solid var(--alert);
+}
+.brand-name {
+  font-family: "Instrument Serif", serif;
+  font-weight: 400;
+  font-size: 26px;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.nav-links {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.nav-links a:hover { color: var(--alert); }
+.nav-cta {
+  background: var(--alert);
+  color: var(--bone);
+  padding: 9px 16px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.1s;
+}
+.nav-cta:hover { background: var(--ink); }
 
-  .btn-alt {
-    background: transparent; color: var(--ink);
-  }
-  .btn-alt:hover { background: var(--ink); color: var(--bone); }
+/* ===== HERO ===== */
+.hero {
+  border-bottom: 2px solid var(--ink);
+  padding: 96px var(--pad) 72px;
+}
+.hero-inner { max-width: 880px; }
+.hero-eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--alert);
+  margin-bottom: 28px;
+  font-weight: 500;
+}
+.hero-headline {
+  font-family: "Instrument Serif", serif;
+  font-size: clamp(56px, 9vw, 144px);
+  line-height: 0.94;
+  letter-spacing: -0.025em;
+  font-weight: 400;
+  margin-bottom: 36px;
+}
+.hero-headline em { font-style: italic; }
+.hero-lead {
+  font-family: "Instrument Serif", serif;
+  font-size: clamp(18px, 1.6vw, 22px);
+  line-height: 1.5;
+  color: var(--ink-soft);
+  max-width: 580px;
+  margin-bottom: 44px;
+}
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.btn-primary,
+.btn-secondary {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 500;
+  padding: 14px 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.1s;
+  cursor: pointer;
+}
+.btn-primary {
+  background: var(--ink);
+  color: var(--bone);
+  border: 1px solid var(--ink);
+}
+.btn-primary:hover {
+  background: var(--alert);
+  border-color: var(--alert);
+}
+.btn-secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--ink);
+}
+.btn-secondary:hover {
+  background: var(--ink);
+  color: var(--bone);
+}
 
-  .btn-alert {
-    background: var(--alert); color: var(--bone); border-color: var(--alert);
-  }
-  .btn-alert:hover { background: var(--ink); border-color: var(--ink); }
+/* ===== STAT STRIP ===== */
+.stat-strip {
+  border-bottom: 2px solid var(--ink);
+  padding: 22px var(--pad);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: "Instrument Serif", serif;
+  font-size: 18px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.stat-strip .dot { color: var(--ink-faint); }
+.stat-strip .num { font-style: italic; font-weight: 400; }
+.stat-strip .accent { color: var(--alert); }
+.stat-strip .accent .num { font-style: italic; }
 
-  /* ---------- TICKER ---------- */
-  .ticker {
-    border-bottom: 1px solid var(--ink);
-    overflow: hidden;
-    background: var(--bone-2);
-    height: 30px;
-    display: flex; align-items: center;
-    position: relative;
-  }
-  .ticker-label {
-    background: var(--ink); color: var(--alert);
-    height: 100%; display: flex; align-items: center;
-    padding: 0 14px; font-size: 10px;
-    letter-spacing: 0.16em; text-transform: uppercase;
-    border-right: 1px solid var(--ink);
-    flex-shrink: 0; font-weight: 700;
-  }
-  .ticker-track {
-    display: flex; gap: 48px;
-    animation: scroll 60s linear infinite;
-    white-space: nowrap;
-    padding-left: 48px;
-    font-size: 11px;
-  }
-  @keyframes scroll {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
-  }
-  .ticker-item { display: inline-flex; gap: 10px; align-items: center; }
-  .ticker-item .pill {
-    padding: 1px 6px; border: 1px solid var(--ink);
-    font-size: 9px; letter-spacing: 0.12em;
-  }
-  .pill.high { background: var(--alert); color: var(--bone); border-color: var(--alert); }
-  .pill.low { background: var(--ink); color: var(--bone); }
-  .pill.med { background: var(--bone); }
+/* ===== SECTION ===== */
+.section {
+  border-bottom: 2px solid var(--ink);
+  padding: 96px var(--pad);
+}
+.section.dark {
+  background: var(--ink);
+  color: var(--bone);
+}
+.section-eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--alert);
+  margin-bottom: 18px;
+  font-weight: 500;
+}
+.section-title {
+  font-family: "Instrument Serif", serif;
+  font-size: clamp(44px, 6vw, 88px);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+  margin-bottom: 48px;
+  max-width: 880px;
+}
+.section-title em { font-style: italic; }
+.section-lead {
+  font-family: "Instrument Serif", serif;
+  font-size: 20px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 600px;
+  margin-bottom: 56px;
+}
+.section.dark .section-lead { color: rgba(232, 227, 214, 0.7); }
 
-  /* ---------- HERO ---------- */
-  .hero {
-    border-bottom: 2px solid var(--ink);
-    padding: 80px var(--pad) 64px;
-    position: relative;
-  }
-  .hero-meta {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0;
-    margin-bottom: 80px;
-    border-top: 1px solid var(--ink);
-    border-bottom: 1px solid var(--ink);
-  }
-  .hero-meta .cell {
-    padding: 14px 18px;
-    border-right: 1px solid var(--ink);
-    font-size: 10px; letter-spacing: 0.14em;
-    text-transform: uppercase;
-    display: flex; flex-direction: column; gap: 4px;
-  }
-  .hero-meta .cell:last-child { border-right: none; }
-  .hero-meta .cell .k { color: var(--ink-soft); font-weight: 500; }
-  .hero-meta .cell .v { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; }
-  .hero-meta .cell .v .red { color: var(--alert); }
+/* ===== SEARCH DEMO ===== */
+.search-block {
+  max-width: 720px;
+}
+.search-box {
+  border: 2px solid var(--ink);
+  background: var(--bone);
+  display: flex;
+  align-items: stretch;
+  margin-bottom: 36px;
+}
+.search-box input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-family: "Instrument Serif", serif;
+  font-size: 22px;
+  padding: 18px 22px;
+  color: var(--ink);
+}
+.search-box input::placeholder { color: var(--ink-faint); }
+.search-box button {
+  background: var(--ink);
+  color: var(--bone);
+  padding: 0 26px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.search-box button:hover { background: var(--alert); }
 
-  .hero-headline {
-    font-family: "Instrument Serif", serif;
-    font-size: clamp(60px, 11vw, 180px);
-    line-height: 0.86;
-    letter-spacing: -0.02em;
-    font-weight: 400;
-    margin-bottom: 40px;
-  }
-  .hero-headline .it { font-style: italic; }
-  .hero-headline .strike {
-    position: relative; display: inline-block;
-  }
-  .hero-headline .strike::after {
-    content: ""; position: absolute;
-    left: -2%; right: -2%;
-    top: 52%;
-    height: 6px; background: var(--alert);
-    transform: rotate(-2deg);
-  }
+.search-fields {
+  font-family: "Instrument Serif", serif;
+  font-size: 16px;
+  color: var(--ink-faint);
+  line-height: 1.6;
+}
+.search-fields strong {
+  color: var(--ink);
+  font-weight: 400;
+  font-style: italic;
+}
 
-  .hero-grid {
-    display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 48px;
-    align-items: end;
-    margin-top: 48px;
-  }
+/* ===== RESULT CARD ===== */
+.result-card {
+  border: 2px solid var(--ink);
+  background: var(--bone);
+  margin-top: 48px;
+  overflow: hidden;
+}
+.result-head {
+  background: var(--ink);
+  color: var(--bone);
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.result-head .right { color: var(--alert); font-weight: 700; }
+.result-body {
+  display: grid;
+  grid-template-columns: auto 1fr;
+}
+.risk-block {
+  background: var(--alert);
+  color: var(--bone);
+  padding: 28px 32px;
+  border-right: 1px solid var(--ink);
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+}
+.risk-lbl {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  opacity: 0.9;
+}
+.risk-score {
+  font-family: "Instrument Serif", serif;
+  font-size: 96px;
+  line-height: 0.85;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+}
+.risk-out {
+  font-family: "Instrument Serif", serif;
+  font-size: 14px;
+  font-style: italic;
+  margin-top: 6px;
+  opacity: 0.85;
+}
+.risk-verdict {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid rgba(232, 227, 214, 0.4);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.result-detail { padding: 24px 28px; }
+.result-name {
+  font-family: "Instrument Serif", serif;
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+}
+.result-name em { font-style: italic; }
+.result-meta {
+  font-family: "Instrument Serif", serif;
+  font-size: 15px;
+  color: var(--ink-faint);
+  margin-bottom: 18px;
+}
+.result-meta .dot { margin: 0 6px; }
+.result-flags {
+  display: flex;
+  gap: 28px;
+  padding-top: 16px;
+  border-top: 1px solid var(--ink);
+  flex-wrap: wrap;
+}
+.flag-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.flag-item .lbl {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.flag-item .v {
+  font-family: "Instrument Serif", serif;
+  font-size: 28px;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--alert);
+  line-height: 1;
+}
 
-  .hero-lead {
-    font-size: 16px; line-height: 1.55; max-width: 520px;
-    color: var(--ink);
-  }
-  .hero-lead strong { background: var(--alert); color: var(--bone); padding: 0 4px; font-weight: 500; }
+/* ===== SOURCES ===== */
+.sources-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--ink);
+}
+.source-card {
+  padding: 32px 28px;
+  border-right: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 240px;
+  background: var(--bone);
+  transition: background 0.1s, color 0.1s;
+}
+.source-card:nth-child(3n) { border-right: none; }
+.source-card:nth-last-child(-n+3) { border-bottom: none; }
+.source-card:hover { background: var(--ink); color: var(--bone); }
+.source-card:hover .src-meta { color: rgba(232, 227, 214, 0.6); }
+.src-num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--alert);
+  font-weight: 700;
+}
+.src-title {
+  font-family: "Instrument Serif", serif;
+  font-size: 34px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  font-weight: 400;
+  margin-top: auto;
+}
+.src-title em { font-style: italic; }
+.src-desc {
+  font-family: "Instrument Serif", serif;
+  font-size: 16px;
+  line-height: 1.55;
+  color: inherit;
+}
+.source-card:not(:hover) .src-desc { color: var(--ink-soft); }
+.src-meta {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  padding-top: 14px;
+  border-top: 1px solid currentColor;
+}
 
-  .hero-actions { display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
-  .hero-actions .row { display: flex; gap: 0; }
-  .hero-actions .row .btn { border-right: none; }
-  .hero-actions .row .btn:last-child { border-right: 1px solid var(--ink); }
-  .hero-note {
-    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--ink-soft); display: flex; gap: 10px; align-items: center;
-  }
-  .hero-note .dot { width: 6px; height: 6px; background: var(--alert); border-radius: 50%; }
+/* ===== PROCESS ===== */
+.process-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--bone);
+}
+.step {
+  padding: 32px 28px;
+  border-right: 1px solid var(--bone);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: 280px;
+}
+.step:last-child { border-right: none; }
+.step-num {
+  font-family: "Instrument Serif", serif;
+  font-size: 80px;
+  line-height: 0.85;
+  color: var(--alert);
+  font-style: italic;
+  font-weight: 400;
+}
+.step-title {
+  font-family: "Instrument Serif", serif;
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+.step-title em { font-style: italic; }
+.step-body {
+  font-family: "Instrument Serif", serif;
+  font-size: 16px;
+  line-height: 1.55;
+  color: rgba(232, 227, 214, 0.7);
+  margin-top: auto;
+}
 
-  /* ---------- SEARCH DEMO ---------- */
-  .demo {
-    border-bottom: 2px solid var(--ink);
-    padding: 0;
-    display: grid;
-    grid-template-columns: 1fr 1.3fr;
-  }
-  .demo-left {
-    border-right: 1px solid var(--ink);
-    padding: 56px var(--pad);
-    background: var(--bone-2);
-    position: relative;
-  }
-  .section-tag {
-    display: inline-flex; align-items: center; gap: 10px;
-    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
-    margin-bottom: 32px;
-    border: 1px solid var(--ink); padding: 5px 10px;
-    background: var(--bone);
-  }
-  .section-tag .num {
-    color: var(--alert); font-weight: 700;
-    border-right: 1px solid var(--ink); padding-right: 10px; margin-right: 4px;
-  }
-  .demo h2 {
-    font-family: "Instrument Serif", serif;
-    font-size: clamp(36px, 5vw, 64px);
-    line-height: 0.95; font-weight: 400;
-    margin-bottom: 24px;
-    letter-spacing: -0.01em;
-  }
-  .demo h2 em { font-style: italic; }
-  .demo-left p {
-    font-size: 14px; line-height: 1.55; max-width: 460px;
-    margin-bottom: 24px;
-  }
-  .field-list {
-    border: 1px solid var(--ink);
-    background: var(--bone);
-  }
-  .field-list .field {
-    display: grid; grid-template-columns: 32px 1fr auto;
-    border-bottom: 1px solid var(--ink);
-    padding: 10px 14px;
-    font-size: 11px; letter-spacing: 0.04em;
-  }
-  .field-list .field:last-child { border-bottom: none; }
-  .field-list .field .n { color: var(--alert); font-weight: 700; }
-  .field-list .field .label { text-transform: uppercase; letter-spacing: 0.1em; font-size: 10px; color: var(--ink-soft); }
-  .field-list .field .val { font-weight: 700; }
+/* ===== PRICING ===== */
+.tiers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--ink);
+}
+.tier {
+  padding: 36px 32px;
+  border-right: 1px solid var(--ink);
+  display: flex;
+  flex-direction: column;
+  background: var(--bone);
+}
+.tier:last-child { border-right: none; }
+.tier.featured { background: var(--ink); color: var(--bone); }
+.tier-tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  align-self: flex-start;
+  margin-bottom: 22px;
+  border: 1px solid currentColor;
+  padding: 4px 9px;
+}
+.tier.featured .tier-tag {
+  background: var(--alert);
+  border-color: var(--alert);
+}
+.tier-name {
+  font-family: "Instrument Serif", serif;
+  font-size: 44px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+.tier-name em { font-style: italic; }
+.tier-price {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding-bottom: 22px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid currentColor;
+}
+.tier-price .amount {
+  font-family: "Instrument Serif", serif;
+  font-size: 56px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.tier-price .amount em { font-style: italic; }
+.tier-price .unit {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.tier-features {
+  list-style: none;
+  margin: 0 0 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.tier-features li {
+  font-family: "Instrument Serif", serif;
+  font-size: 16px;
+  line-height: 1.45;
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 10px;
+}
+.tier-features li::before {
+  content: "→";
+  font-family: "JetBrains Mono", monospace;
+  color: var(--alert);
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.tier-cta {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 500;
+  padding: 14px 22px;
+  border: 1px solid currentColor;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+.tier-cta:hover {
+  background: var(--alert);
+  border-color: var(--alert);
+  color: var(--bone);
+}
+.tier.featured .tier-cta {
+  background: var(--alert);
+  border-color: var(--alert);
+  color: var(--bone);
+}
+.tier.featured .tier-cta:hover {
+  background: var(--bone);
+  border-color: var(--bone);
+  color: var(--ink);
+}
 
-  .demo-right {
-    padding: 56px var(--pad);
-    background: var(--bone);
-  }
-  .search-box {
-    border: 2px solid var(--ink);
-    background: var(--bone);
-    margin-bottom: 24px;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: stretch;
-  }
-  .search-box input {
-    padding: 18px 18px;
-    border: none; outline: none; background: transparent;
-    font: inherit; font-size: 14px;
-    letter-spacing: 0.02em; color: var(--ink);
-  }
-  .search-box input::placeholder { color: var(--ink-soft); }
-  .search-box .submit {
-    background: var(--ink); color: var(--bone);
-    padding: 0 22px;
-    font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
-    font-weight: 500; cursor: pointer;
-    transition: background 0.08s;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .search-box .submit:hover { background: var(--alert); }
+/* ===== CTA ===== */
+.cta-section {
+  background: var(--alert);
+  color: var(--bone);
+  padding: 120px var(--pad);
+  border-bottom: 2px solid var(--ink);
+}
+.cta-headline {
+  font-family: "Instrument Serif", serif;
+  font-size: clamp(56px, 9vw, 144px);
+  line-height: 0.92;
+  letter-spacing: -0.025em;
+  font-weight: 400;
+  margin-bottom: 36px;
+  max-width: 900px;
+}
+.cta-headline em { font-style: italic; }
+.cta-lead {
+  font-family: "Instrument Serif", serif;
+  font-size: 20px;
+  line-height: 1.55;
+  max-width: 520px;
+  margin-bottom: 36px;
+  opacity: 0.9;
+}
+.cta-btn {
+  background: var(--ink);
+  color: var(--bone);
+  border: 1px solid var(--ink);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 500;
+  padding: 16px 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+.cta-btn:hover {
+  background: var(--bone);
+  color: var(--ink);
+  border-color: var(--bone);
+}
 
-  /* result card */
-  .result {
-    border: 2px solid var(--ink);
-    background: var(--bone);
-    overflow: hidden;
-  }
-  .result-head {
-    background: var(--ink); color: var(--bone);
-    padding: 8px 14px;
-    font-size: 10px; letter-spacing: 0.16em;
-    text-transform: uppercase;
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .result-head .right { color: var(--alert); }
-  .result-body {
-    display: grid;
-    grid-template-columns: auto 1fr;
-  }
-  .risk-block {
-    border-right: 1px solid var(--ink);
-    padding: 24px 28px;
-    background: var(--alert); color: var(--bone);
-    display: flex; flex-direction: column; gap: 4px;
-    min-width: 170px;
-  }
-  .risk-block .lbl { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.85; }
-  .risk-block .score {
-    font-family: "Instrument Serif", serif;
-    font-size: 96px; line-height: 0.85;
-    font-weight: 400;
-  }
-  .risk-block .out { font-size: 11px; opacity: 0.85; letter-spacing: 0.06em; }
-  .risk-block .verdict {
-    margin-top: 8px;
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 0.14em; text-transform: uppercase;
-    border-top: 1px solid rgba(255,255,255,0.4); padding-top: 8px;
-  }
+/* ===== FOOTER ===== */
+footer {
+  background: var(--ink);
+  color: var(--bone);
+}
+.footer-top {
+  padding: 64px var(--pad) 48px;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 48px;
+  border-bottom: 1px solid rgba(232, 227, 214, 0.2);
+}
+.footer-brand .brand-mark {
+  background: var(--alert);
+  color: var(--ink);
+}
+.footer-brand .brand-mark::after { border-color: var(--ink); }
+.footer-brand .brand-name { color: var(--bone); }
+.footer-tagline {
+  font-family: "Instrument Serif", serif;
+  font-size: 16px;
+  line-height: 1.55;
+  margin-top: 22px;
+  opacity: 0.7;
+  max-width: 320px;
+}
+.footer-col h4 {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--alert);
+  margin-bottom: 22px;
+  font-weight: 500;
+}
+.footer-col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.footer-col ul a {
+  font-family: "Instrument Serif", serif;
+  font-size: 17px;
+  opacity: 0.85;
+  transition: opacity 0.1s, color 0.1s;
+}
+.footer-col ul a:hover {
+  color: var(--alert);
+  opacity: 1;
+}
+.footer-bottom {
+  padding: 18px var(--pad);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
 
-  .biz-info {
-    padding: 16px 18px;
-    display: flex; flex-direction: column; gap: 10px;
-  }
-  .biz-info .name { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
-  .biz-info .meta {
-    display: flex; flex-wrap: wrap; gap: 8px 14px;
-    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--ink-soft);
-  }
-  .flags {
-    border-top: 1px solid var(--ink);
-    display: grid; grid-template-columns: repeat(3, 1fr);
-  }
-  .flags .flag {
-    border-right: 1px solid var(--ink);
-    padding: 12px 14px;
-    display: flex; flex-direction: column; gap: 2px;
-  }
-  .flags .flag:last-child { border-right: none; }
-  .flags .flag .lbl { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); }
-  .flags .flag .v { font-size: 18px; font-weight: 700; }
-  .flags .flag .v.bad { color: var(--alert); }
-  .flag-row {
-    border-top: 1px solid var(--ink);
-    padding: 10px 14px;
-    display: flex; gap: 8px; flex-wrap: wrap;
-  }
-  .chip {
-    border: 1px solid var(--ink);
-    padding: 3px 8px;
-    font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
-  }
-  .chip.bad { background: var(--alert); color: var(--bone); border-color: var(--alert); }
-  .chip.warn { background: var(--ink); color: var(--bone); }
-
-  /* ---------- DATA SOURCES ---------- */
-  .sources {
-    border-bottom: 2px solid var(--ink);
-    padding: 80px var(--pad);
-    position: relative;
-  }
-  .sources-head {
-    display: grid; grid-template-columns: 1fr 1.4fr;
-    gap: 48px; margin-bottom: 56px;
-    align-items: end;
-  }
-  .sources h2 {
-    font-family: "Instrument Serif", serif;
-    font-size: clamp(40px, 6vw, 88px);
-    line-height: 0.92; font-weight: 400;
-    letter-spacing: -0.01em;
-  }
-  .sources h2 em { font-style: italic; }
-  .sources-head p {
-    font-size: 14px; line-height: 1.55; max-width: 480px;
-  }
-
-  .sources-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    border: 1px solid var(--ink);
-  }
-  .source-card {
-    padding: 28px 26px 24px;
-    border-right: 1px solid var(--ink);
-    border-bottom: 1px solid var(--ink);
-    background: var(--bone);
-    display: flex; flex-direction: column; gap: 14px;
-    min-height: 220px;
-    position: relative;
-    transition: background 0.1s;
-  }
-  .source-card:nth-child(3n) { border-right: none; }
-  .source-card:nth-last-child(-n+3) { border-bottom: none; }
-  .source-card:hover { background: var(--ink); color: var(--bone); }
-  .source-card:hover .src-num { color: var(--alert); }
-  .source-card:hover .src-meta { color: var(--bone); opacity: 0.7; }
-  .src-num {
-    font-size: 11px; letter-spacing: 0.18em; font-weight: 700;
-    color: var(--ink-soft);
-  }
-  .src-title {
-    font-family: "Instrument Serif", serif;
-    font-size: 32px; line-height: 1; font-weight: 400;
-    letter-spacing: -0.01em;
-    margin-top: auto;
-  }
-  .src-title em { font-style: italic; }
-  .src-desc { font-size: 12px; line-height: 1.5; }
-  .src-meta {
-    font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--ink-soft);
-    border-top: 1px solid currentColor;
-    padding-top: 10px;
-    display: flex; justify-content: space-between;
-  }
-
-  /* ---------- HOW IT WORKS ---------- */
-  .process {
-    border-bottom: 2px solid var(--ink);
-    padding: 80px var(--pad);
-    background: var(--ink);
-    color: var(--bone);
-    background-image:
-      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
-    background-size: 80px 80px;
-  }
-  .process .section-tag {
-    background: var(--ink); color: var(--bone);
-    border-color: var(--bone);
-  }
-  .process .section-tag .num { border-color: var(--bone); }
-  .process h2 {
-    font-family: "Instrument Serif", serif;
-    font-size: clamp(40px, 6vw, 88px);
-    line-height: 0.92; font-weight: 400;
-    margin-bottom: 56px;
-    letter-spacing: -0.01em;
-    max-width: 1000px;
-  }
-  .process h2 em { font-style: italic; }
-  .process h2 .acc { color: var(--alert); }
-
-  .steps {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    border: 1px solid var(--bone);
-  }
-  .step {
-    padding: 28px 26px;
-    border-right: 1px solid var(--bone);
-    display: flex; flex-direction: column; gap: 18px;
-    min-height: 280px;
-  }
-  .step:last-child { border-right: none; }
-  .step-num {
-    font-family: "Instrument Serif", serif;
-    font-size: 80px; line-height: 0.85; font-weight: 400;
-    color: var(--alert);
-    font-style: italic;
-  }
-  .step-title {
-    font-size: 13px; letter-spacing: 0.06em;
-    text-transform: uppercase; font-weight: 700;
-  }
-  .step-body { font-size: 12px; line-height: 1.55; opacity: 0.8; margin-top: auto; }
-
-  /* ---------- BIG STATS ---------- */
-  .stats {
-    border-bottom: 2px solid var(--ink);
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-  }
-  .stat {
-    padding: 56px 32px 36px;
-    border-right: 1px solid var(--ink);
-    display: flex; flex-direction: column; gap: 10px;
-    min-height: 240px;
-    position: relative;
-  }
-  .stat:last-child { border-right: none; }
-  .stat:nth-child(2) { background: var(--alert); color: var(--bone); }
-  .stat-num {
-    font-family: "Instrument Serif", serif;
-    font-size: clamp(56px, 7vw, 112px);
-    line-height: 0.85; font-weight: 400;
-    letter-spacing: -0.02em;
-  }
-  .stat-num em { font-style: italic; }
-  .stat-num sup { font-size: 0.5em; vertical-align: top; line-height: 1; margin-left: 2px; }
-  .stat-label {
-    font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
-    margin-top: auto;
-  }
-  .stat-sub {
-    font-size: 11px; line-height: 1.4;
-    color: var(--ink-soft);
-    border-top: 1px solid var(--ink); padding-top: 10px;
-    margin-top: 6px;
-  }
-  .stat:nth-child(2) .stat-sub { color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.4); }
-
-  /* ---------- PRICING ---------- */
-  .pricing {
-    border-bottom: 2px solid var(--ink);
-    padding: 80px var(--pad) 0;
-  }
-  .pricing-head {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 48px; margin-bottom: 56px; align-items: end;
-  }
-  .pricing h2 {
-    font-family: "Instrument Serif", serif;
-    font-size: clamp(40px, 6vw, 88px);
-    line-height: 0.92; font-weight: 400;
-    letter-spacing: -0.01em;
-  }
-  .pricing h2 em { font-style: italic; }
-  .pricing-head p { font-size: 14px; line-height: 1.55; max-width: 460px; }
-
-  .tiers {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    border-top: 1px solid var(--ink);
-    border-left: 1px solid var(--ink);
-    border-right: 1px solid var(--ink);
-  }
-  .tier {
-    padding: 32px 28px 32px;
-    border-right: 1px solid var(--ink);
-    display: flex; flex-direction: column;
-    background: var(--bone);
-    position: relative;
-  }
-  .tier:last-child { border-right: none; }
-  .tier.featured { background: var(--ink); color: var(--bone); }
-  .tier.featured .tier-price small,
-  .tier.featured .tier-features li { opacity: 0.85; }
-  .tier-tag {
-    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
-    border: 1px solid currentColor; padding: 3px 8px;
-    align-self: flex-start;
-    margin-bottom: 18px;
-  }
-  .tier.featured .tier-tag { background: var(--alert); border-color: var(--alert); }
-  .tier-name {
-    font-family: "Instrument Serif", serif;
-    font-size: 36px; font-weight: 400; letter-spacing: -0.01em;
-    margin-bottom: 6px;
-  }
-  .tier-name em { font-style: italic; }
-  .tier-price {
-    font-size: 14px; letter-spacing: 0.04em;
-    border-bottom: 1px solid currentColor;
-    padding-bottom: 18px; margin-bottom: 18px;
-    display: flex; align-items: baseline; gap: 8px;
-  }
-  .tier-price strong {
-    font-family: "Instrument Serif", serif;
-    font-size: 56px; font-weight: 400; line-height: 1;
-    letter-spacing: -0.02em;
-  }
-  .tier-price small { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; }
-  .tier-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
-  .tier-features li {
-    display: grid; grid-template-columns: 18px 1fr;
-    gap: 8px; font-size: 12px; line-height: 1.4;
-  }
-  .tier-features li::before {
-    content: "→"; color: var(--alert); font-weight: 700;
-  }
-  .tier .btn { margin-top: auto; align-self: stretch; justify-content: space-between; }
-  .tier.featured .btn { background: var(--alert); border-color: var(--alert); color: var(--bone); }
-  .tier.featured .btn:hover { background: var(--bone); color: var(--ink); border-color: var(--bone); }
-
-  .pricing-foot {
-    border-top: 1px solid var(--ink);
-    border-bottom: 1px solid var(--ink);
-    padding: 14px var(--pad);
-    margin: 0 calc(var(--pad) * -1) 0;
-    display: flex; justify-content: space-between; align-items: center;
-    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
-    background: var(--bone-2);
-  }
-  .pricing-foot .right { display: flex; gap: 18px; align-items: center; }
-
-  /* ---------- CTA ---------- */
-  .cta {
-    background: var(--alert); color: var(--bone);
-    padding: 80px var(--pad);
-    border-bottom: 2px solid var(--ink);
-    position: relative; overflow: hidden;
-  }
-  .cta-grid {
-    display: grid; grid-template-columns: 1.5fr 1fr;
-    gap: 56px; align-items: end;
-  }
-  .cta h2 {
-    font-family: "Instrument Serif", serif;
-    font-size: clamp(56px, 9vw, 168px);
-    line-height: 0.85; font-weight: 400;
-    letter-spacing: -0.02em;
-  }
-  .cta h2 em { font-style: italic; }
-  .cta-side {
-    display: flex; flex-direction: column; gap: 20px;
-    align-items: flex-start;
-  }
-  .cta-side p { font-size: 14px; line-height: 1.55; max-width: 360px; }
-  .cta-side .btn {
-    background: var(--ink); border-color: var(--ink); color: var(--bone);
-  }
-  .cta-side .btn:hover { background: var(--bone); color: var(--ink); border-color: var(--bone); }
-
-  /* ---------- FOOTER ---------- */
-  footer {
-    background: var(--ink); color: var(--bone);
-    padding: 0;
-  }
-  .footer-grid {
-    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
-    gap: 0;
-    border-bottom: 1px solid rgba(255,255,255,0.2);
-  }
-  .footer-col {
-    padding: 56px 32px;
-    border-right: 1px solid rgba(255,255,255,0.2);
-  }
-  .footer-col:last-child { border-right: none; }
-  .footer-brand .brand-mark { background: var(--alert); color: var(--ink); }
-  .footer-brand .brand-mark::after { border-color: var(--ink); }
-  .footer-brand .brand {
-    display: flex; align-items: center; gap: 14px;
-    margin-bottom: 22px;
-  }
-  .footer-brand p { font-size: 13px; line-height: 1.5; max-width: 360px; opacity: 0.7; }
-  .footer-col h4 {
-    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--alert); margin-bottom: 22px; font-weight: 500;
-  }
-  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-  .footer-col ul a { font-size: 12px; letter-spacing: 0.04em; opacity: 0.85; }
-  .footer-col ul a:hover { color: var(--alert); opacity: 1; }
-  .footer-bottom {
-    padding: 14px var(--pad);
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
-    opacity: 0.7;
-  }
-  .footer-bottom .right-align { text-align: right; }
-
-  /* ---------- RESPONSIVE ---------- */
-  @media (max-width: 980px) {
-    .nav { grid-template-columns: 1fr auto; height: 64px; }
-    .nav-links { display: none; }
-    .hero-meta { grid-template-columns: repeat(2, 1fr); }
-    .hero-meta .cell:nth-child(2) { border-right: none; }
-    .hero-meta .cell:nth-child(-n+2) { border-bottom: 1px solid var(--ink); }
-    .hero-grid { grid-template-columns: 1fr; gap: 32px; }
-    .demo { grid-template-columns: 1fr; }
-    .demo-left { border-right: none; border-bottom: 1px solid var(--ink); }
-    .sources-head, .pricing-head, .cta-grid { grid-template-columns: 1fr; gap: 24px; }
-    .sources-grid { grid-template-columns: 1fr 1fr; }
-    .source-card { border-right: 1px solid var(--ink) !important; }
-    .source-card:nth-child(2n) { border-right: none !important; }
-    .steps { grid-template-columns: 1fr 1fr; }
-    .step { border-bottom: 1px solid var(--bone); }
-    .step:nth-child(2n) { border-right: none; }
-    .stats { grid-template-columns: 1fr 1fr; }
-    .stat:nth-child(-n+2) { border-bottom: 1px solid var(--ink); }
-    .stat:nth-child(2n) { border-right: none; }
-    .tiers { grid-template-columns: 1fr; }
-    .tier { border-right: none; border-bottom: 1px solid var(--ink); }
-    .tier:last-child { border-bottom: none; }
-    .footer-grid { grid-template-columns: 1fr 1fr; }
-    .footer-col:nth-child(2) { border-right: none; }
-    .footer-col:nth-child(-n+2) { border-bottom: 1px solid rgba(255,255,255,0.2); }
-    .footer-bottom { grid-template-columns: 1fr 1fr; }
-    .result-body { grid-template-columns: 1fr; }
-    .risk-block { border-right: none; border-bottom: 1px solid var(--ink); }
-    .flags { grid-template-columns: 1fr; }
-    .flags .flag { border-right: none; border-bottom: 1px solid var(--ink); }
-    .flags .flag:last-child { border-bottom: none; }
-  }
-  @media (max-width: 560px) {
-    .topbar { font-size: 9px; grid-template-columns: 1fr auto; }
-    .topbar .center { display: none; }
-    .nav .brand-sub { display: none; }
-    .hero { padding: 48px var(--pad) 40px; }
-    .hero-meta { margin-bottom: 48px; }
-    .sources-grid { grid-template-columns: 1fr; }
-    .source-card { border-right: none !important; }
-    .steps { grid-template-columns: 1fr; }
-    .step { border-right: none; }
-  }
+/* ===== RESPONSIVE ===== */
+@media (max-width: 980px) {
+  .nav-links { display: none; }
+  .sources-grid { grid-template-columns: 1fr 1fr; }
+  .source-card { border-right: 1px solid var(--ink) !important; border-bottom: 1px solid var(--ink) !important; }
+  .source-card:nth-child(2n) { border-right: none !important; }
+  .process-steps { grid-template-columns: 1fr 1fr; }
+  .step { border-bottom: 1px solid var(--bone); }
+  .step:nth-child(2n) { border-right: none; }
+  .tiers { grid-template-columns: 1fr; }
+  .tier { border-right: none; border-bottom: 1px solid var(--ink); }
+  .tier:last-child { border-bottom: none; }
+  .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+  .footer-brand { grid-column: 1 / -1; }
+  .result-body { grid-template-columns: 1fr; }
+  .risk-block { border-right: none; border-bottom: 1px solid var(--ink); }
+  .result-flags { gap: 18px; }
+}
+@media (max-width: 560px) {
+  .hero { padding: 56px var(--pad) 48px; }
+  .section { padding: 64px var(--pad); }
+  .sources-grid { grid-template-columns: 1fr; }
+  .source-card { border-right: none !important; }
+  .source-card:last-child { border-bottom: none !important; }
+  .process-steps { grid-template-columns: 1fr; }
+  .step { border-right: none; }
+  .step:last-child { border-bottom: none; }
+  .stat-strip { font-size: 16px; }
+  .footer-top { grid-template-columns: 1fr; }
+  .footer-bottom { flex-direction: column; gap: 8px; }
+  .nav-cta span:not(:first-child) { display: none; }
+}
 </style>
 </head>
 <body>
 
-<!-- TOP STATUS BAR -->
-<div class="topbar">
-  <div class="left">
-    <span><span class="blink"></span>&nbsp;LIVE • SYS.OK</span>
-    <span class="hidden-mobile">N 40°44′ W 74°00′</span>
-  </div>
-  <div class="center">
-    <span>QV / TERMINAL v4.2.1</span>
-  </div>
-  <div class="right">
-    <span>SESSION ID — A8F·QX2·1140</span>
-    <span style="color: var(--alert);">●&nbsp;3,241 ANALYSTS ONLINE</span>
-  </div>
-</div>
-
 <!-- NAV -->
 <nav class="nav">
-  <div class="brand">
+  <a href="index.html" class="brand">
     <div class="brand-mark">Q</div>
-    <div>
-      <div class="brand-name">QUICKVETT</div>
-      <div class="brand-sub">PRE-FUNDING INTEL · EST. 2024</div>
-    </div>
-  </div>
+    <span class="brand-name">Quickvett</span>
+  </a>
   <div class="nav-links">
-    <a href="#"><span class="num">01</span>Product</a>
-    <a href="#"><span class="num">02</span>Sources</a>
-    <a href="#"><span class="num">03</span>Pricing</a>
-    <a href="#"><span class="num">04</span>API</a>
-    <a href="#"><span class="num">05</span>Docs</a>
+    <a href="#product">Product</a>
+    <a href="#sources">Sources</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#docs">Docs</a>
   </div>
-  <div class="nav-cta">
-    <a href="#" class="login">Log in →</a>
-    <button class="btn btn-alert">Request Access <span class="arrow">↗</span></button>
-  </div>
+  <a href="#access" class="nav-cta">Request access →</a>
 </nav>
-
-<!-- TICKER -->
-<div class="ticker">
-  <div class="ticker-label">// LAST 60 MIN</div>
-  <div class="ticker-track">
-    <span class="ticker-item">APEX LOGISTICS LLC <span class="pill high">RISK 87</span></span>
-    <span class="ticker-item">RIVERFRONT TRADING CO <span class="pill low">RISK 12</span></span>
-    <span class="ticker-item">MERIDIAN AUTO GROUP <span class="pill med">RISK 44</span></span>
-    <span class="ticker-item">CASTLE BRICK & STONE <span class="pill low">RISK 09</span></span>
-    <span class="ticker-item">HARBOR POINT FOODS INC <span class="pill high">RISK 91</span></span>
-    <span class="ticker-item">DELTA HVAC SERVICES <span class="pill med">RISK 38</span></span>
-    <span class="ticker-item">SUNRIDGE CONSTRUCTION <span class="pill low">RISK 18</span></span>
-    <span class="ticker-item">PINNACLE MED SUPPLY <span class="pill high">RISK 76</span></span>
-    <!-- duplicated for seamless loop -->
-    <span class="ticker-item">APEX LOGISTICS LLC <span class="pill high">RISK 87</span></span>
-    <span class="ticker-item">RIVERFRONT TRADING CO <span class="pill low">RISK 12</span></span>
-    <span class="ticker-item">MERIDIAN AUTO GROUP <span class="pill med">RISK 44</span></span>
-    <span class="ticker-item">CASTLE BRICK & STONE <span class="pill low">RISK 09</span></span>
-    <span class="ticker-item">HARBOR POINT FOODS INC <span class="pill high">RISK 91</span></span>
-    <span class="ticker-item">DELTA HVAC SERVICES <span class="pill med">RISK 38</span></span>
-    <span class="ticker-item">SUNRIDGE CONSTRUCTION <span class="pill low">RISK 18</span></span>
-    <span class="ticker-item">PINNACLE MED SUPPLY <span class="pill high">RISK 76</span></span>
-  </div>
-</div>
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-meta">
-    <div class="cell"><span class="k">// File</span><span class="v">QV—001 / Manifesto</span></div>
-    <div class="cell"><span class="k">// Indexed</span><span class="v">4.2M+ U.S. Entities</span></div>
-    <div class="cell"><span class="k">// Avg. Time-to-Verdict</span><span class="v"><span class="red">7.3 sec</span></span></div>
-    <div class="cell"><span class="k">// Updated</span><span class="v">Friday, 08 May 2026</span></div>
-  </div>
-
-  <h1 class="hero-headline">
-    Vet before<br>
-    you <span class="strike">fund.</span> <span class="it">Always.</span>
-  </h1>
-
-  <div class="hero-grid">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">— Pre-funding intelligence</div>
+    <h1 class="hero-headline">Vet before you <em>fund.</em></h1>
     <p class="hero-lead">
-      QuickVett is the underwriting terminal for merchant cash advance teams. Pull a complete intelligence report on any U.S. business — and the people behind it — in under ten seconds. <strong>UCC liens, judgments, court records, prior MCA exposure, owner history.</strong> Decide with the file open.
+      A complete underwriting dossier on any U.S. business and the people behind it — in under ten seconds.
     </p>
     <div class="hero-actions">
-      <div class="row">
-        <button class="btn">Run a Search <span class="arrow">→</span></button>
-        <button class="btn btn-alt">Watch 90-sec demo</button>
-      </div>
-      <div class="hero-note"><span class="dot"></span> No setup. Pay per report or unlimited seats.</div>
+      <a href="#product" class="btn-primary">Run a search <span>→</span></a>
+      <a href="#demo" class="btn-secondary">Watch demo</a>
     </div>
   </div>
 </section>
+
+<!-- STAT STRIP -->
+<div class="stat-strip">
+  <span><em class="num">4.2M</em> entities indexed</span>
+  <span class="dot">·</span>
+  <span><em class="num">7.3s</em> average verdict</span>
+  <span class="dot">·</span>
+  <span><em class="num">12</em> data sources</span>
+  <span class="dot">·</span>
+  <span class="accent"><em class="num">38%</em> default reduction</span>
+</div>
 
 <!-- SEARCH DEMO -->
-<section class="demo">
-  <div class="demo-left">
-    <span class="section-tag"><span class="num">02</span>Search</span>
-    <h2>One field.<br>Twelve <em>data sources.</em></h2>
-    <p>
-      Type a business name, EIN, address, or owner. We cross-reference twelve public and proprietary sources and return a single underwriting verdict — with the receipts.
-    </p>
-    <div class="field-list">
-      <div class="field"><span class="n">01</span><span class="label">Legal Name / DBA</span><span class="val">✓</span></div>
-      <div class="field"><span class="n">02</span><span class="label">EIN / Tax ID</span><span class="val">✓</span></div>
-      <div class="field"><span class="n">03</span><span class="label">Owner Name</span><span class="val">✓</span></div>
-      <div class="field"><span class="n">04</span><span class="label">Address / Phone</span><span class="val">✓</span></div>
-    </div>
-  </div>
-  <div class="demo-right">
-    <span class="section-tag"><span class="num">03</span>Live Result</span>
+<section id="product" class="section">
+  <div class="section-eyebrow">— 01 / Search</div>
+  <h2 class="section-title">One field.<br><em>Twelve</em> data sources.</h2>
+  <p class="section-lead">
+    Type a business name, EIN, address, or owner. We cross-reference twelve public and proprietary sources and return a single underwriting verdict — with the receipts.
+  </p>
+
+  <div class="search-block">
     <form class="search-box" action="report.html" method="get">
-      <input type="text" name="q" value="Apex Logistics LLC, NJ" />
-      <button class="submit" type="submit">Vet Now <span>→</span></button>
+      <input type="text" name="q" placeholder="Business name, EIN, address, or owner…" value="Apex Logistics LLC, NJ">
+      <button type="submit">Vet now <span>→</span></button>
     </form>
-    <div class="result">
-      <div class="result-head">
-        <span>// REPORT QV-887421 — Generated 7.1s ago</span>
-        <span class="right">● HIGH RISK</span>
+    <p class="search-fields">
+      Accepts <strong>legal name & DBA</strong>, <strong>EIN or tax ID</strong>, <strong>owner name</strong>, or <strong>address and phone</strong>.
+    </p>
+  </div>
+
+  <!-- Live result preview -->
+  <a href="report.html" class="result-card" style="display: block; cursor: pointer; text-decoration: none; color: inherit;">
+    <div class="result-head">
+      <span>// Report QV-887421 — Generated 7.1s ago</span>
+      <span class="right">● High risk</span>
+    </div>
+    <div class="result-body">
+      <div class="risk-block">
+        <span class="risk-lbl">Quickvett score</span>
+        <span class="risk-score">87</span>
+        <span class="risk-out">of 100 risk</span>
+        <span class="risk-verdict">Decline / Escalate</span>
       </div>
-      <div class="result-body">
-        <div class="risk-block">
-          <span class="lbl">Quickvett Score</span>
-          <span class="score">87</span>
-          <span class="out">/ 100 risk</span>
-          <span class="verdict">Decline / Escalate</span>
+      <div class="result-detail">
+        <div class="result-name"><em>Apex</em> Logistics LLC</div>
+        <div class="result-meta">
+          EIN ··· 4892 <span class="dot">·</span>
+          Newark NJ <span class="dot">·</span>
+          Owner: M. Reyes <span class="dot">·</span>
+          Trucking
         </div>
-        <div>
-          <div class="biz-info">
-            <div class="name">Apex Logistics LLC</div>
-            <div class="meta">
-              <span>EIN ··· 4892</span>
-              <span>NJ · 2019</span>
-              <span>Owner: M. Reyes</span>
-              <span>Trucking · NAICS 484</span>
-            </div>
+        <div class="result-flags">
+          <div class="flag-item">
+            <span class="lbl">Active UCC liens</span>
+            <span class="v">14</span>
           </div>
-          <div class="flags">
-            <div class="flag"><span class="lbl">Active UCC Liens</span><span class="v bad">14</span></div>
-            <div class="flag"><span class="lbl">Open Judgments</span><span class="v bad">3</span></div>
-            <div class="flag"><span class="lbl">Prior MCAs</span><span class="v bad">9</span></div>
+          <div class="flag-item">
+            <span class="lbl">Open judgments</span>
+            <span class="v">3</span>
           </div>
-          <div class="flag-row">
-            <span class="chip bad">Stacked Funding</span>
-            <span class="chip bad">Tax Lien · Federal</span>
-            <span class="chip warn">Address Mismatch</span>
-            <span class="chip warn">Owner DBA Overlap</span>
+          <div class="flag-item">
+            <span class="lbl">Prior MCAs</span>
+            <span class="v">9</span>
+          </div>
+          <div class="flag-item">
+            <span class="lbl">Tax liens</span>
+            <span class="v">2</span>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </a>
 </section>
 
-<!-- DATA SOURCES -->
-<section class="sources">
-  <div class="sources-head">
-    <h2>The <em>file</em><br>on every<br>business.</h2>
-    <p>
-      We don't just pull from one bureau. QuickVett aggregates public records, court filings, regulatory data, and proprietary MCA-industry signals into a single underwriting picture. Every flag is sourced and cited.
-    </p>
-  </div>
+<!-- SOURCES -->
+<section id="sources" class="section">
+  <div class="section-eyebrow">— 02 / Sources</div>
+  <h2 class="section-title">The <em>file</em> on every business.</h2>
+  <p class="section-lead">
+    Public records, court filings, regulatory data, and proprietary MCA-industry signals — aggregated into one underwriting picture. Every flag is sourced and cited.
+  </p>
+
   <div class="sources-grid">
     <div class="source-card">
       <div class="src-num">01 / 06</div>
-      <div class="src-title"><em>UCC</em> filings</div>
-      <div class="src-desc">All 50 secretary-of-state databases. Active liens, terminations, secured-party history. Stacking patterns flagged automatically.</div>
-      <div class="src-meta"><span>SOS · NATIONAL</span><span>↗</span></div>
+      <p class="src-desc">All 50 secretary-of-state databases. Active liens, terminations, secured-party history. Stacking patterns flagged automatically.</p>
+      <h3 class="src-title"><em>UCC</em> filings</h3>
+      <div class="src-meta">SOS · National</div>
     </div>
     <div class="source-card">
       <div class="src-num">02 / 06</div>
-      <div class="src-title">Court &amp; <em>judgment</em> records</div>
-      <div class="src-desc">Federal and state court dockets. Open civil suits, default judgments, bankruptcy filings, confessions of judgment.</div>
-      <div class="src-meta"><span>PACER · STATE</span><span>↗</span></div>
+      <p class="src-desc">Federal and state court dockets. Open civil suits, default judgments, bankruptcy filings, confessions of judgment.</p>
+      <h3 class="src-title">Court & <em>judgments</em></h3>
+      <div class="src-meta">PACER · State</div>
     </div>
     <div class="source-card">
       <div class="src-num">03 / 06</div>
-      <div class="src-title"><em>Owner</em> background</div>
-      <div class="src-desc">Owner history across every entity they've operated. Prior dissolutions, sanctions, OFAC checks, criminal records where lawful.</div>
-      <div class="src-meta"><span>OFAC · PROPRIETARY</span><span>↗</span></div>
+      <p class="src-desc">Owner history across every entity they've operated. Prior dissolutions, sanctions, OFAC checks, criminal records where lawful.</p>
+      <h3 class="src-title"><em>Owner</em> background</h3>
+      <div class="src-meta">OFAC · Proprietary</div>
     </div>
     <div class="source-card">
       <div class="src-num">04 / 06</div>
-      <div class="src-title">Prior <em>MCA</em> exposure</div>
-      <div class="src-desc">Industry-shared signal of prior cash-advance funding, stacking behavior, and historical default flags. Anonymous, opted-in.</div>
-      <div class="src-meta"><span>QV CONSORTIUM</span><span>↗</span></div>
+      <p class="src-desc">Industry-shared signal of prior cash-advance funding, stacking behavior, and historical default flags. Anonymous, opted-in.</p>
+      <h3 class="src-title">Prior <em>MCA</em> exposure</h3>
+      <div class="src-meta">QV Consortium</div>
     </div>
     <div class="source-card">
       <div class="src-num">05 / 06</div>
-      <div class="src-title">Tax &amp; <em>regulatory</em> liens</div>
-      <div class="src-desc">IRS federal tax liens, state tax liens, payroll-tax delinquencies, and regulatory enforcement actions across agencies.</div>
-      <div class="src-meta"><span>IRS · STATE</span><span>↗</span></div>
+      <p class="src-desc">IRS federal tax liens, state tax liens, payroll-tax delinquencies, and regulatory enforcement actions across agencies.</p>
+      <h3 class="src-title">Tax & <em>regulatory</em></h3>
+      <div class="src-meta">IRS · State</div>
     </div>
     <div class="source-card">
       <div class="src-num">06 / 06</div>
-      <div class="src-title">Identity &amp; <em>address</em></div>
-      <div class="src-desc">Verifies physical operations, registered address validity, mail-drop detection, and phone/web footprint consistency.</div>
-      <div class="src-meta"><span>GEO · OSINT</span><span>↗</span></div>
+      <p class="src-desc">Verifies physical operations, registered address validity, mail-drop detection, and phone & web footprint consistency.</p>
+      <h3 class="src-title">Identity & <em>address</em></h3>
+      <div class="src-meta">GEO · OSINT</div>
     </div>
   </div>
 </section>
 
 <!-- PROCESS -->
-<section class="process">
-  <span class="section-tag"><span class="num">04</span>Workflow</span>
-  <h2>From <em>name to</em><br>verdict in <span class="acc">under 10 seconds.</span></h2>
-  <div class="steps">
+<section class="section dark">
+  <div class="section-eyebrow">— 03 / Workflow</div>
+  <h2 class="section-title">From name to <em>verdict</em><br>in ten seconds.</h2>
+
+  <div class="process-steps">
     <div class="step">
       <div class="step-num">i.</div>
-      <div class="step-title">Submit</div>
-      <div class="step-body">Drop a business name, EIN, address, or merchant application. Bulk-upload via CSV or API.</div>
+      <h3 class="step-title"><em>Submit</em></h3>
+      <p class="step-body">Drop a business name, EIN, address, or merchant application. Bulk-upload via CSV or API.</p>
     </div>
     <div class="step">
       <div class="step-num">ii.</div>
-      <div class="step-title">Aggregate</div>
-      <div class="step-body">We query 12+ sources in parallel. Records are matched, deduped, and entity-resolved against the merchant.</div>
+      <h3 class="step-title"><em>Aggregate</em></h3>
+      <p class="step-body">We query twelve sources in parallel. Records are matched, deduped, and entity-resolved against the merchant.</p>
     </div>
     <div class="step">
       <div class="step-num">iii.</div>
-      <div class="step-title">Score</div>
-      <div class="step-body">Our model produces a 0–100 risk score with weighted, transparent factors. Configurable thresholds per portfolio.</div>
+      <h3 class="step-title"><em>Score</em></h3>
+      <p class="step-body">Our model produces a 0–100 risk score with weighted, transparent factors. Configurable thresholds per portfolio.</p>
     </div>
     <div class="step">
       <div class="step-num">iv.</div>
-      <div class="step-title">Decide</div>
-      <div class="step-body">Approve, decline, or escalate with full citations attached. Export PDF or push to your CRM in one click.</div>
+      <h3 class="step-title"><em>Decide</em></h3>
+      <p class="step-body">Approve, decline, or escalate with full citations attached. Export PDF or push to your CRM in one click.</p>
     </div>
-  </div>
-</section>
-
-<!-- STATS -->
-<section class="stats">
-  <div class="stat">
-    <div class="stat-num">4.2<em>M</em><sup>+</sup></div>
-    <div class="stat-label">// U.S. Entities Indexed</div>
-    <div class="stat-sub">Updated daily across all 50 secretaries of state, federal, and county records.</div>
-  </div>
-  <div class="stat">
-    <div class="stat-num">7.3<em>s</em></div>
-    <div class="stat-label">// Avg. Time-to-Verdict</div>
-    <div class="stat-sub">From submitted name to scored, sourced underwriting report. P95 under 11 seconds.</div>
-  </div>
-  <div class="stat">
-    <div class="stat-num">$1.4<em>B</em></div>
-    <div class="stat-label">// Funded Volume Vetted</div>
-    <div class="stat-sub">Cumulative MCA capital screened by QuickVett-using funders since launch.</div>
-  </div>
-  <div class="stat">
-    <div class="stat-num">38<em>%</em></div>
-    <div class="stat-label">// Default-Rate Reduction</div>
-    <div class="stat-sub">Median reduction reported by funders integrating QV at the underwriting layer.</div>
   </div>
 </section>
 
 <!-- PRICING -->
-<section class="pricing">
-  <div class="pricing-head">
-    <h2>Pay per <em>file.</em><br>Or per <em>desk.</em></h2>
-    <p>Three plans. No long-term contracts. Cancel any time. Volume credits roll forward 90 days. Enterprise SSO and on-prem available on the Bureau plan.</p>
-  </div>
+<section id="pricing" class="section">
+  <div class="section-eyebrow">— 04 / Pricing</div>
+  <h2 class="section-title">Pay per <em>file.</em><br>Or per <em>desk.</em></h2>
+  <p class="section-lead">
+    Three plans. No long-term contracts. Volume credits roll forward 90 days. Enterprise SSO and on-prem available.
+  </p>
+
   <div class="tiers">
     <div class="tier">
       <span class="tier-tag">Solo</span>
       <h3 class="tier-name">Analyst</h3>
-      <div class="tier-price"><strong>$0.49</strong><small>per report</small></div>
+      <div class="tier-price">
+        <span class="amount">$0.49</span>
+        <span class="unit">per report</span>
+      </div>
       <ul class="tier-features">
         <li>Pay-as-you-go pricing</li>
-        <li>Full underwriting report &amp; score</li>
+        <li>Full underwriting report & score</li>
         <li>Unlimited seats, no minimums</li>
-        <li>PDF export &amp; citations</li>
+        <li>PDF export & citations</li>
         <li>Email support</li>
       </ul>
-      <button class="btn">Start free <span class="arrow">→</span></button>
+      <button class="tier-cta">Start free <span>→</span></button>
     </div>
     <div class="tier featured">
       <span class="tier-tag">Most popular</span>
       <h3 class="tier-name">Desk <em>↗</em></h3>
-      <div class="tier-price"><strong>$899</strong><small>/ month · 5,000 reports</small></div>
+      <div class="tier-price">
+        <span class="amount">$899</span>
+        <span class="unit">/ mo · 5,000 reports</span>
+      </div>
       <ul class="tier-features">
         <li>Everything in Analyst</li>
-        <li>API access &amp; CRM integrations</li>
-        <li>Bulk CSV upload &amp; batch scoring</li>
-        <li>Custom risk thresholds per portfolio</li>
+        <li>API access & CRM integrations</li>
+        <li>Bulk CSV upload & batch scoring</li>
+        <li>Custom risk thresholds</li>
         <li>Priority support · 4hr SLA</li>
       </ul>
-      <button class="btn">Book a demo <span class="arrow">→</span></button>
+      <button class="tier-cta">Book a demo <span>→</span></button>
     </div>
     <div class="tier">
       <span class="tier-tag">Enterprise</span>
       <h3 class="tier-name">Bureau</h3>
-      <div class="tier-price"><strong>Custom</strong><small>volume contract</small></div>
+      <div class="tier-price">
+        <span class="amount"><em>Custom</em></span>
+        <span class="unit">volume contract</span>
+      </div>
       <ul class="tier-features">
-        <li>Unlimited reports &amp; seats</li>
+        <li>Unlimited reports & seats</li>
         <li>SSO, audit logs, role-based access</li>
-        <li>Dedicated CSM &amp; underwriting QA</li>
+        <li>Dedicated CSM & underwriting QA</li>
         <li>Consortium data write-back</li>
-        <li>On-prem / VPC deployment options</li>
+        <li>On-prem / VPC deployment</li>
       </ul>
-      <button class="btn">Talk to sales <span class="arrow">→</span></button>
+      <button class="tier-cta">Talk to sales <span>→</span></button>
     </div>
-  </div>
-  <div class="pricing-foot">
-    <span>// All plans include 12 data sources, score explainability, and audit trail.</span>
-    <span class="right">SOC-2 TYPE II · CCPA · GLBA</span>
   </div>
 </section>
 
 <!-- CTA -->
-<section class="cta">
-  <div class="cta-grid">
-    <h2>Stop funding<br><em>blind.</em></h2>
-    <div class="cta-side">
-      <p>Run your first ten files free. No credit card. See exactly what we know about the merchant before you wire a dollar.</p>
-      <button class="btn">Request Access <span class="arrow">↗</span></button>
-      <span class="tiny" style="opacity: 0.85;">Or call · 1 · 800 · QV · INTEL</span>
-    </div>
-  </div>
+<section id="access" class="cta-section">
+  <h2 class="cta-headline">Stop funding <em>blind.</em></h2>
+  <p class="cta-lead">
+    Run your first ten files free. No credit card. See exactly what we know about the merchant before you wire a dollar.
+  </p>
+  <a href="#" class="cta-btn">Request access <span>↗</span></a>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-grid">
-    <div class="footer-col footer-brand">
+  <div class="footer-top">
+    <div class="footer-brand">
       <div class="brand">
         <div class="brand-mark">Q</div>
-        <div>
-          <div class="brand-name">QUICKVETT</div>
-          <div class="brand-sub" style="color: var(--alert);">PRE-FUNDING INTEL · EST. 2024</div>
-        </div>
+        <span class="brand-name">Quickvett</span>
       </div>
-      <p>The underwriting terminal for merchant cash advance teams. Built by ex-funders who got tired of finding out about the fourteenth lien at month two.</p>
+      <p class="footer-tagline">The underwriting terminal for merchant cash advance teams. Built by ex-funders who got tired of finding out about the fourteenth lien at month two.</p>
     </div>
     <div class="footer-col">
-      <h4>// Product</h4>
+      <h4>— Product</h4>
       <ul>
         <li><a href="#">Search</a></li>
-        <li><a href="#">Bulk Scoring</a></li>
+        <li><a href="#">Bulk scoring</a></li>
         <li><a href="#">API</a></li>
         <li><a href="#">Integrations</a></li>
-        <li><a href="#">Changelog</a></li>
       </ul>
     </div>
     <div class="footer-col">
-      <h4>// Company</h4>
+      <h4>— Company</h4>
       <ul>
         <li><a href="#">About</a></li>
         <li><a href="#">Customers</a></li>
-        <li><a href="#">Press</a></li>
         <li><a href="#">Careers</a></li>
         <li><a href="#">Contact</a></li>
       </ul>
     </div>
     <div class="footer-col">
-      <h4>// Legal</h4>
+      <h4>— Legal</h4>
       <ul>
         <li><a href="#">Terms</a></li>
         <li><a href="#">Privacy</a></li>
         <li><a href="#">FCRA / GLBA</a></li>
         <li><a href="#">Security</a></li>
-        <li><a href="#">Status ●</a></li>
       </ul>
     </div>
   </div>
   <div class="footer-bottom">
-    <span>© 2026 QUICKVETT, INC.</span>
-    <span>NEW YORK · NY</span>
-    <span>SOC-2 TYPE II</span>
-    <span class="right-align">SYS.OK · v4.2.1</span>
+    <span>© 2026 Quickvett, Inc.</span>
+    <span>New York · NY</span>
+    <span>SOC-2 Type II</span>
   </div>
 </footer>
 
